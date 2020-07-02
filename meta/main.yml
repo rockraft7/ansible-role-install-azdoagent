@@ -1,0 +1,15 @@
+galaxy_info:
+  author: M Faizal Sidek
+  description: Install Azure DevOps agent on Windows/Linux
+  company: PETRONAS
+  license:
+    - MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: Windows
+      versions:
+        - 2019
+    - name: EL
+      versions:
+        - 7
+  galaxy_tags: ["azuredevops","agent","windows2019","windows","centos","rhel"]  

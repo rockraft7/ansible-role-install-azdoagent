@@ -1,0 +1,12 @@
+---
+
+- name: Set up Azure DevOps agent on Windows
+  include_tasks: setup-Windows.yml
+  when:
+    - ansible_os_family == 'Windows'
+
+- name: Set up Azure DevOps agent on CentOS
+  include_tasks: setup-centos.yml
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution == 'CentOS'

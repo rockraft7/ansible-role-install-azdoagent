@@ -1,0 +1,4 @@
+---
+linux_agent_url: https://vstsagentpackage.azureedge.net/agent/2.170.1/vsts-agent-linux-x64-2.170.1.tar.gz
+azdo_install_dir: E:\azagent
+windows_agent_url: https://vstsagentpackage.azureedge.net/agent/2.170.1/vsts-agent-win-x64-2.170.1.zip

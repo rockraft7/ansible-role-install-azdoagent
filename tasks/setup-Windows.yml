@@ -1,0 +1,23 @@
+---
+- name: Create temporary download directory.
+  win_tempfile:
+    state: directory
+    suffix: downloads
+  register: path
+- name: Download VSTS agent
+  win_get_url:
+    url: "{{ windows_agent_url }}"
+    dest: "{{ path.path }}\\vsts-agent-win.zip"
+- name: Create azagent install directory
+  win_file:
+    path: "{{ azdo_install_dir }}"
+    state: directory
+- name: Unzip VSTS agent
+  win_unzip:
+    src: "{{ path.path }}\\vsts-agent-win.zip"
+    dest: "{{ azdo_install_dir }}"
+- name: Install VSTS agent
+  win_shell: "config.cmd --unattended --url {{ azdo_url }} --auth pat --token {{ azdo_token }} --pool {{ azdo_poolname }} --agent {{ inventory_hostname }} --acceptTeeEula --runAsService"
+  args:
+    chdir: "{{ azdo_install_dir }}"
+    executable: cmd

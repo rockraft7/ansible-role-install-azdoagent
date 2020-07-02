@@ -1,0 +1,64 @@
+---
+
+- name: Check if azure agent has been installed
+  stat:
+    path: /etc/vsts.d
+  register: vsts_agent
+
+- name: Install Azure VSTS Agent if not yet exists
+  block:
+    - name: Add agent user
+      user:
+        name: vsts
+        create_home: yes
+        system: yes
+        home: /etc/vsts.d
+    - name: Download VSTS agent
+      get_url:
+        url: "{{ linux_agent_url }}"
+        dest: /tmp/vsts-agent-linux.tar.gz
+        mode: 0640
+
+    - name: Unzip VSTS agent
+      unarchive:
+        remote_src: yes
+        src: /tmp/vsts-agent-linux.tar.gz
+        dest: /etc/vsts.d
+        mode: 0755
+
+    - name: Create necessary directories.
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      with_items:
+        - /etc/vsts.d/_diag
+        - /etc/vsts.d/_work
+
+    - name: Change ownership to vsts
+      file:
+        path: /etc/vsts.d
+        state: directory
+        recurse: yes
+        owner: vsts
+        group: vsts
+
+    - name: Install VSTS dependencies
+      shell: 
+        chdir: /etc/vsts.d/bin
+        cmd: "./installdependencies.sh"
+
+    - name: Install VSTS agent
+      shell: 
+        cmd: "./config.sh --unattended --url {{ azdo_url }} --auth pat --token {{ azdo_token }} --pool {{ azdo_poolname }} --agent {{ inventory_hostname }} --acceptTeeEula"
+        chdir: /etc/vsts.d
+      become_user: vsts
+
+    - name: Install as a service
+      shell:
+        cmd: "{{ item }}"
+        chdir: /etc/vsts.d
+      with_items:
+        - "./svc.sh install vsts"
+        - "./svc.sh start"
+  when: not vsts_agent.stat.exists
